@@ -6,3 +6,6 @@ JNechaevsky/international-doom
 bradharding/doomretro
 kraflab/dsda-doom
 fabiangreffrath/crispy-doom
+ZDoom/gzdoom
+edge-classic/EDGE-classic
+team-eternity/eternity

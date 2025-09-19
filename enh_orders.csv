@@ -1,0 +1,10 @@
+id,side,quantity,price,type,timestamp,filled,user,visible_qty,reserve_qty,is_iceberg,is_display,stop_price
+1002,BUY,100,9.5,LIMIT,3,0,B1,,,False,False,
+1003,BUY,120,9.0,LIMIT,4,0,B2,,,False,False,
+1004,SELL,200,11.0,LIMIT,5,0,Ice1,20,180,True,False,
+1005,BUY,100,,MARKET,6,100,StopTaker,,,False,False,10.2
+1006,SELL,80,9.1,STOP_LIMIT,7,0,StopMaker,,,False,False,9.2
+1007,BUY,220,,MARKET,8,220,TakerMkt,,,False,False,
+1008,BUY,90,10.5,LIMIT,12,30,TakerLimit,,,False,False,
+1009,BUY,200,9.0,IOC,14,0,IOCBuyer,,,False,False,
+1010,BUY,500,9.5,FOK,15,0,FOKBuyer,,,False,False,

@@ -9,3 +9,6 @@ fabiangreffrath/crispy-doom
 ZDoom/gzdoom
 edge-classic/EDGE-classic
 team-eternity/eternity
+DavidKinder/Inform6
+DavidKinder/Windows-Frotz
+johanberntsson/PunyInform

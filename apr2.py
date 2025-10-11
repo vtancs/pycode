@@ -1,3 +1,5 @@
+import sys
+import os
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side, numbers
@@ -8,13 +10,11 @@ def calculate_apr_from_monthly(P, A, n, tol=1e-10, max_iter=10000):
     Calculate APR using binary search, with improved stability.
     Returns (monthly_rate, annual_percentage_rate)
     """
-    # If payment can't even repay the loan, APR is undefined
     if A * n <= P:
         print("\n⚠️ Invalid loan terms: monthly payments too low to repay principal.")
         return 0.0, 0.0
 
-    # Binary search between 0% and 200% monthly rate (wide range)
-    low, high = 0.0, 2.0
+    low, high = 0.0, 2.0  # up to 200% monthly
     r = 0.0
 
     for _ in range(max_iter):
@@ -35,7 +35,6 @@ def calculate_apr_from_monthly(P, A, n, tol=1e-10, max_iter=10000):
 
     apr = r * 12 * 100
     return r, apr
-
 
 
 def generate_amortization_schedule(P, A, r, n):
@@ -69,8 +68,8 @@ def display_schedule(schedule):
               f"{row['Principal']:>12.2f}{row['Remaining Balance']:>15.2f}")
 
 
-def export_schedule(schedule, P, A, n, apr):
-    """Export schedule with loan details, totals, and summaries to Excel and CSV."""
+def export_schedule(schedule, P, A, n, apr, output_folder="."):
+    """Export schedule and summary to Excel and CSV, with optional output folder."""
     df = pd.DataFrame(schedule)
 
     # --- Totals ---
@@ -101,11 +100,13 @@ def export_schedule(schedule, P, A, n, apr):
         "Value": [P, A, n, f"{apr:.2f}%", total_interest, total_cost]
     }
 
-    # --- Auto-generated filenames ---
+    # --- Prepare filenames and ensure output folder exists ---
     apr_str = f"{apr:.2f}".replace(".", "_")
     filename_base = f"Loan_{int(P)}_{n}mo_{apr_str}APR"
-    csv_file = f"{filename_base}.csv"
-    excel_file = f"{filename_base}.xlsx"
+    os.makedirs(output_folder, exist_ok=True)
+
+    csv_file = os.path.join(output_folder, f"{filename_base}.csv")
+    excel_file = os.path.join(output_folder, f"{filename_base}.xlsx")
 
     # --- Save CSV ---
     df.to_csv(csv_file, index=False)
@@ -169,13 +170,35 @@ def export_schedule(schedule, P, A, n, apr):
 if __name__ == "__main__":
     print("📘 Loan APR Calculator & Amortization Schedule")
     print("------------------------------------------------")
-    P = float(input("Enter the loan amount (principal): "))
-    A = float(input("Enter the monthly payment: "))
-    n = int(input("Enter the number of monthly payments: "))
 
+    # --- Command-line mode ---
+    if len(sys.argv) >= 4:
+        try:
+            P = float(sys.argv[1])
+            A = float(sys.argv[2])
+            n = int(sys.argv[3])
+            output_folder = sys.argv[4] if len(sys.argv) >= 5 else "."
+            print(f"Using command-line inputs: Loan={P}, Payment={A}, Months={n}")
+            if output_folder != ".":
+                print(f"Output folder: {output_folder}")
+        except ValueError:
+            print("❌ Invalid command-line arguments. Please provide numeric values.")
+            sys.exit(1)
+    else:
+        # --- Interactive mode ---
+        P = float(input("Enter the loan amount (principal): "))
+        A = float(input("Enter the monthly payment: "))
+        n = int(input("Enter the number of monthly payments: "))
+        output_folder = input("Enter output folder path (or leave blank for current folder): ").strip() or "."
+
+    # --- Calculation ---
     monthly_rate, apr = calculate_apr_from_monthly(P, A, n)
-    print(f"\nThe Annual Percentage Rate (APR) is: {apr:.2f}%")
 
-    schedule = generate_amortization_schedule(P, A, monthly_rate, n)
-    display_schedule(schedule)
-    export_schedule(schedule, P, A, n, apr)
+    if apr == 0.0:
+        print("\n⚠️ APR cannot be calculated with the given inputs.")
+        print("   Try increasing the monthly payment or loan duration.\n")
+    else:
+        print(f"\nThe Annual Percentage Rate (APR) is: {apr:.2f}%")
+        schedule = generate_amortization_schedule(P, A, monthly_rate, n)
+        display_schedule(schedule)
+        export_schedule(schedule, P, A, n, apr, output_folder)

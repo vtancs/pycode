@@ -31,7 +31,7 @@ def rotate_x(points, angle):
                   [0, s, c]])
     return points @ R.T
 
-def apply_lensing(points, strength=1200, radius=400):
+def apply_lensing(points, strength=800, radius=200):
     """Apply gravitational lensing near the black hole center."""
     for i in range(len(points)):
         x, y, z = points[i]

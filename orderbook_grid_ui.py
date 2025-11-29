@@ -242,7 +242,11 @@ class OrderBookUI:
         # draw mid spread box with best bid/ask
         bid, ask = self.book.best()
         mid_x = self.width//2 - 60
-        mid_y = top_y + self.depth*row_h//2 - 20
+        mid_y = top_y + self.depth*row_h//2 - 200
+        #
+        # mid_x = self.width//2 - 60
+        # mid_y = top_y + self.depth*row_h//2 - 20
+        
         pygame.draw.rect(self.screen, (40,40,44), (mid_x, mid_y, 120, 48), border_radius=8)
         if bid is not None and ask is not None:
             spread = ask - bid
@@ -256,7 +260,7 @@ class OrderBookUI:
     def draw_trades_panel(self):
         # small panel on bottom-left showing recent trades
         x = 20
-        y = self.height - 140
+        y = self.height - 200  # 140
         w = 340
         h = 120
         pygame.draw.rect(self.screen, (22,24,28), (x, y, w, h), border_radius=8)

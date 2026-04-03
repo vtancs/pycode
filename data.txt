@@ -1,0 +1,867 @@
+Archive-name: apple2/doscmd
+Posting-Frequency: monthly
+Last-modified: February 8 1998
+Version: 1.03
+URL: http://www.visi.com/~nathan/a2/faq/dos.html
+
+
+                          Apple II DOS & Commands FAQ
+                                       
+   This document attempts to give a detailed and correct set of Apple II
+   DOS command line commands, covering those found in official releases
+   of DOS 3.3 and ProDOS. It may also get into usage notes, non-command
+   line OSs (GS/OS), etc, eventually.
+   
+   Copyright (c) 1997 by Nathan Mates (email: nathan@visi.com), all
+   rights reserved. This document can be freely copied so long as 1) it
+   is not sold, 2) any sections reposted elsewhere from it are credited
+   back to this FAQ with the FAQ's copyright info and official WWW
+   location (http://www.visi.com/~nathan/a2/faq/dos.html) left in place.
+   
+   This FAQ may not be sold, bundled on disks or CD-ROMs, reprinted in
+   magazines, books, periodicals, or the like without prior consent from
+   the author and copyright holder, Nathan Mates. Exceptions are
+   explicitly granted for Joe Kohn's Shareware Solutions II newsletter,
+   and Jim Maricondo's Golden Orchard CD-ROM collection. Email me for
+   permission otherwise.
+   
+   Further, please do NOT make a copy of this FAQ and post it on the web;
+   I'm continually updating and fixing sections of it. A html link is
+   fine.
+   
+   Disclaimer: I've tried to make this FAQ as accurate as possible, but
+   there's the chance that it's not perfect. I apologize in advance for
+   any slipups. Until I am confident that all information is 100%
+   accurate, you are advised that you are following all info at your own
+   risk. I will fix any problems found with this FAQ, but will not be
+   held liable for the results of problems.
+   
+   Last-modified: February 8, 1998
+   Version: 1.03
+   
+Table of Contents
+
+   Section 1: General Intro to this FAQ and the command line environment
+          
+   Section 2: History and features of DOS 3.x and ProDOS
+          2.1 History of DOS 3.x and ProDOS
+          2.2 Features of DOS 3.x
+          2.3 Features of ProDOS
+          
+   Section 3: Commands quick reference
+          A listing of all commands, one per line, to facilitate finding
+          the appropriate commands.
+          
+   Section 4: In depth explanation of commands, optional params
+          4.1 DOS 3.x file names and types
+          4.2 ProDOS file names and types
+          4.3 Extended command line parameters for DOS 3.x commands
+          4.4 Extended command line parameters for ProDOS commands
+          4.5 Detailed explanation of commands: -, APPEND, BLOAD, BSAVE,
+          BRUN, BYE, CAT, CATALOG, CHAIN, CLOSE, CREATE, DELETE, EXEC,
+          FLUSH, FP, FRE, IN#, INIT, INT, LOAD, LOCK, MAXFILES, MON, MTR,
+          NOMON, OPEN, POSITION, PR#, PREFIX, READ, RENAME, RESTORE, RUN,
+          SAVE, STORE, UNLOCK, VERIFY, WRITE
+          
+   Section 5: Miscellaneous questions and answers
+          5.1: Which OS am I in?
+          5.2: How do I format a disk?
+          5.3: How do I copy/move files/disks?
+          5.4: Can I put DOS 3.x on my hard disk?
+          5.5: Can I speed up DOS 3.3 or ProDOS?
+          5.6: What about file/disk undeletion?
+          5.7: How do I view a text file?
+          5.8: What does "UNABLE TO LOAD PRODOS" mean when I boot a disk?
+          
+          5.9: How do I switch drives/disks?
+          5.10: I don't have an OS for my Apple II. Where do I get it
+          from?
+          
+     _________________________________________________________________
+                                      
+Section 1: General Intro to this FAQ and the command line environment
+
+   This FAQ attempts to be a reference for the commands supported by DOS
+   3.x (x=2, 2.1, or 3) and ProDOS at the command line level, as well as
+   general usability issues. It does not cover where to acquire a copy
+   and/or upgrade to any version of any OS; you should visit the
+   comp.sys.apple2 Frequently Asked Questions (FAQ) at
+   http://www.visi.com/~nathan/a2/faq/csa2.html section 7.2 and other
+   referenced sections.
+   
+   Note that ProDOS does not have any command line support in the base
+   OS; all command line functionality is part of the Applesoft BASIC
+   environment provided by launching the 'BASIC.SYSTEM' 'System' file.
+   Without BASIC.SYSTEM, ProDOS only has a Machine Language Interface
+   (MLI) for interfacing with apps; during the rest of this FAQ, I have
+   been lazy in referring to things as 'ProDOS' commands when they are
+   ProDOS's BASIC.SYSTEM commands.
+   
+   Applesoft BASIC commands are not included in this FAQ; they have a FAQ
+   of their own at http://www.visi.com/~nathan/a2/faq/asoft.html.
+   
+   This FAQ has a set of conventions as to items presented. Items
+   presented in square brackets '[' ']' are optional. 'filename' is a
+   legal filename for the OS being used, and for ProDOS, 'dirname' is a
+   legal directory/path name, 'volname' is a ProDOS volume name. I list
+   all commands in uppercase; DOS 3.x is case sensitive and commands must
+   be uppercased. ProDOS is case insensitive, but for consistency,
+   commands are still uppercased.
+     _________________________________________________________________
+                                      
+Section 2: History and features of DOS 3.x and ProDOS
+
+  2.1 History of DOS 3.x and ProDOS
+  
+   Apple's DOS (Disk Operating System) was written to support their Disk
+   ][ drive when it debuted in early 1978. Version numbers for software
+   were not as strict as they are now; the code started at v0.1, and
+   incremented that by 0.1 per revision. When delivered to Apple, it was
+   at version 3.0, and after Apple was done with their last
+   modifications, v3.1 was the first version shipped. As the disk drive
+   was single sided, all support for Apple 5.25" disks has been
+   singlesided only.
+   
+   With various bugfixes, DOS was at version 3.2.1 by 1979. These early
+   releases supported only 13 sectors/track * 35 tracks for a total of
+   113.75K per disk side. With technological improvements to the disk
+   interface card, 16 sectors could be fit in, for a total of 140K/side.
+   DOS 3.3 was the revision capable of handling these 140K disks, and was
+   released in 1980.
+   
+   ProDOS was comissioned to be the 'Professional Disk Operating System',
+   abbreviated 'ProDOS', and was first part of the Apple III's
+   'Sophisticated Operating System' (SOS, for an unfortunate acronym
+   related to the general state of the Apple III). ProDOS was designed to
+   be a replacement for DOS 3.3, and added many features not part of
+   original DOS 3.3 such as support for disks other than the 5.25" drive,
+   as well as directories and timestamping of files. A number of people
+   have continued to use DOS 3.3 for various reasons, though ProDOS and
+   various GS versions of it (ProDOS 16 and GS/OS) have become much more
+   popular among Apple IIGS owners, as well as HD users.
+   
+  2.2 Features of DOS 3.x
+  
+   DOS 3.x as released from Apple supports only the 113.75 and 140K 5.25"
+   disk formats. It supports up to 105 files per side, no directory
+   support, with very loose rules on filenames. It was initially bundled
+   with Apple's disk ][ drives, so it won a lot of support for being free
+   and usable. Since 1980, DOS 3.3's 140K per 5.25" side has become the
+   reigning standard for the DOS 3.x versions. DOS 3.x 'System Master'
+   disks could boot and run on any machine with at least 16K of memory
+   (though 24-32K was rather recommended)
+   
+   It did have a number of unsuccessful patches to fix a problem with the
+   APPEND command not properly finding the end of a file before beginning
+   to write; I know of no 100% fixes for that bug.
+   
+   Due to some double-buffering while reading and decoding files off
+   disks, DOS 3.x was not as fast as it could be. A few companies sold
+   modified versions of DOS 3.3 to avoid the extra copy and thus
+   dramatically speed up disk access; Beagle Bros's ProntoDOS and many
+   others were widespread. DOS 3.3 could also be modified to do other
+   things, such as use a few more tracks on disk for extra space,
+   relocate itself into the top 16K of memory on a 64K machine, but
+   again, these were all third party patches, nothing official from
+   Apple. Some of these patches and features came at the expense of the
+   INIT command.
+   
+  2.3 Features of ProDOS
+  
+   ProDOS allowed directories to be created and files stored in them,
+   time/date stamping of files, and support for disks other than the
+   original Disk ][ drive-- up to 32MB per disk volume (partition). It
+   did go with far more restrictive filenames (possibly as an attempt to
+   move 'towards' MS-DOS), and case insensitive filenames at the cost of
+   everything appearing in uppercase.
+   
+   Apart from the very earliest versions, ProDOS has required a 64K Apple
+   II. When the Apple IIGS came out, the need for a 16-bit OS was
+   apparent, so with a quick wrapper around ProDOS, 'ProDOS 16' was
+   created, turning the existing ProDOS to 'ProDOS 8'. Versions 2.x of
+   ProDOS 8 require an enhanced //e, //c, IIc+ or GS.
+   
+   ProDOS incorporates most to all of the disk read speedups provided by
+   DOS 3.3 third party enhancements, so it does not need to be patched to
+   sped up.
+   
+   ProDOS also has the ability to not reside on a disk when first
+   formatted (at obvious disk space savings), but be copied on later and
+   the disk will be bootable if copied correctly to the root directory as
+   well as an application to run at boot. Similar functionality could be
+   gained in DOS 3.x by using certain utility programs, but is not
+   standard.
+   
+   ProDOS's 'BASIC.SYSTEM' commandline functionality gained a few
+   features over DOS 3.3, such as support for typing commands in
+   lowercase. A few lesser-used commands were removed, most notably the
+   ability to switch to 'Integer Basic', as well as disk formatting.
+   
+     _________________________________________________________________
+                                      
+Section 3: Commands quick reference
+
+   A listing of all commands, one per line, to facilitate finding the
+   appropriate commands. Only the required part of each command is shown
+   here; optional parts are detailed in the sections on DOS 3.x optional
+   params and ProDOS optional params.
+   
+   Commands common to both DOS 3.x and ProDOS:
+
+CATALOG                     Shows a directory listing. [ProDOS: see also cat]
+LOAD filename               Loads a Applesoft BASIC program.
+SAVE filename               Saves a Applesoft BASIC program.
+RUN filename                Loads and runs a Applesoft BASIC program.
+BLOAD filename              Loads a binary file.
+BSAVE filename,Aaddr,Llen   Saves a binary file.
+BRUN filename               Loads and executes a binary file
+OPEN filename               Opens a text file. For BASIC programs only.
+CLOSE [filename]            Closes specified (or all) open text files.
+READ filename               Reads from a text file. For BASIC programs only.
+WRITE filename              Writes to a text file. For BASIC programs only.
+APPEND filename             Appends to a text file. For BASIC programs only.
+POSITION filename           Sets position in text file. For BASIC programs only
+.
+EXEC filename               'Executes' a text file, as if every line was typed.
+DELETE filename             Attempts to remove a file from disk
+LOCK filenname              Quick file protect from change or deletion
+UNLOCK filenname            Undoes a LOCK
+RENAME file1,file2          Renames 'file1' to 'file2'
+IN#slotnum                  Redirects input from the specified slot
+PR#slotnum                  Redirects output to the specified slot
+VERIFY filename             Checks existence, DOS 3.3 checks if is readable
+
+   DOS 3.x only commands:
+   
+INIT filename            Formats disk, current BASIC program saved as boot app.
+MON [,C][,I][,O]         Traces DOS 3.3 commands
+NOMON [,C][,I][,O]       Cancels tracing of DOS 3.3 commands
+MAXFILES n               Reserves buffers for disk i/o
+FP                       Switches to Applesoft BASIC, erases program in memory
+INT                      Switches to Integer BASIC, erases program in memory
+
+   ProDOS's BASIC.SYSTEM only commands:
+   
+CAT                      40-column directory listing.
+PREFIX [dirname]         Displays current directory or changes current dir.
+CREATE filename          Creates a file with optional type
+- filename               Executes Applesoft, binary, text, system file
+BYE                      Exits to ProDOS application switcher
+FLUSH                    Writes all buffers to disk
+CHAIN filename           Runs another Applesoft program, variables intact
+FRE                      Faster Applesoft string garbage collection
+STORE filename           Writes Applesoft variables to a file
+RESTORE filename         Reads Applesoft variables from a file
+MTR                      Jumps to monitor (same as 'CALL -151')
+
+     _________________________________________________________________
+                                      
+Section 4: In depth explanation of commands, optional params
+
+  4.1: DOS 3.x file names and types
+  
+   DOS 3.x filenames can from 1-30 characters in length, and must start
+   with an uppercase letter. They cannot contain commas, colons, but can
+   contain control characters. (Return (control-M) is a pain to type, and
+   thus usually out). DOS 3.x has essentially 8 filetypes, noted by the
+   character in the directory listing: Applesoft Basic (A), Integer Basic
+   (I), Text file (T), Binary (B), 'S' (source? -- rarely used) type
+   files, and 'R' (relocatable-- also rarely used) files, plus a second
+   'A' and 'B'.
+   
+   A sample directory listing from a CATALOG is shown below:
+
+DISK VOLUME 254
+*A 006 HELLO
+*I 018 ANIMALS
+*T 003 APPLE PROMS
+*B 010 BOOT13
+
+   The leftmost column contains either a '*' or is empty. A '*' means the
+   file is 'LOCKed' against accidental deletion or overwriting, a blank
+   space means that it can be saved over or deleted at will. The next
+   column is the filetype, as noted above. The third column, of three
+   digit numbers, represents the file size on disk in number of 256-byte
+   sectors used. [If this size is greater than 255, the number is modulo
+   256]. Finally, the filename is given.
+   
+  4.2 ProDOS file names and types
+  
+   ProDOS is far more limited in its filenames. Names are up to 15
+   characters, must start with a letter, and can contain letters, digits
+   [0..9] and the period. Filenames are essentially case insensitive,
+   though they are always displayed as uppercase on disk.
+   
+   ProDOS also allows directories and volume names; components are
+   separated with the forward slash ('/') used by OSs whose designers
+   weren't being idiotic, like MS-DOS.
+   
+   ProDOS allows far more types, allowing 256 'major' types, with each
+   major type capable of having up to 65536 subtypes. Unlike MS-DOS, the
+   filetype is not part of the actual filename, nor can two different
+   files with the same name but different types exist. In a BASIC.SYSTEM
+   and similar directory listing, the major type is listed as either a
+   2-digit hexadecimal value preceede by a $, or for certain other common
+   types, a 3-letter acronym is used. The most common types that are
+   encountered are:
+   'SYS': System files, such as ProDOS and certain applications
+   'DIR': Directory
+   'BIN': Binary file
+   'BAS': Applesoft BASIC file
+   'TXT': Text file
+   
+   Filetypes are not considered part of the filename, so there can only
+   be one file with a given name, regardless of the type. A sample ProDOS
+   directory listing is shown below:
+
+ STARTUP           BAS       12   20-AUG-96  20-AUG-96  3:14    5645
+
+   This is the 80-column version generated by CATALOG; the 40-column
+   version by CAT omits the right 40 columns from the listing. Again, we
+   have the first column being either blank or a '*' for locked files,
+   the filename ('STARTUP' here), then the filetype (BAS), number of
+   512-byte blocks used, creation and modification dates and time, and
+   finally the filelength of 5645 bytes.
+   
+  4.3 Extended command line parameters for DOS 3.x commands
+  
+   Certain commands under DOS 3.3 require a you to specify the address
+   and/or length; this is noted with an ',Aadr' or ',Llen' after the
+   filename. The address and length can be either decimal or hexadecimal
+   (proceeded by a '$'), and must range from 0 to 65535 (0..$FFFF hex).
+   See the extended syntax below for which files require which
+   parameters.
+   
+   'Random access' text files may have the record specified when
+   accessing them by ',Rn', or the byte within a field specified by
+   ',Bn'. For more information on accessing text files from within Basic,
+   please see the Applesoft Basic FAQ at
+   http://www.visi.com/~nathan/a2/faq/asoft.html
+   
+   Pretty much all DOS 3.x commands that deal with files can have any of
+   3 extra parameters specified in any order with commas after the
+   filename: [,Dn] [,Sn] or [,Vn]. ',Dn' sets the drive number for this
+   and subsequent DOS commands; DOS 3.x only supports 2 drives per slot.
+   ',Sn' sets the slot number for this and subsequent DOS commands.
+   Specifying a slot/drive combination that does not exist will return an
+   error. Both the slot and drive number 'stick' until changed, even if
+   the disk is physically swapped for another.
+   
+   The third parameter, ',Vn' sets the "volume number" for DOS 3.3 to
+   'expect' on a disk when accessed. This volume number is specified when
+   formatted with INIT, defaulting to 254 if not specified. ',V0' will
+   match any disk volume number, which is the default.
+   
+  4.4 Extended command line parameters for ProDOS commands
+  
+   While ProDOS lost the ',Vn' parameter, the ',Sn' and ',Dn' can be
+   specified for all commands accessing files. In addition, a number of
+   commands (APPEND, BLOAD, BSAVE, CREATE, OPEN) can take a ',Ttype'
+   parameter, specifying the type of file to match against instead of the
+   default of TXT, BIN, BIN, DIR, and TXT respectively.
+   
+   In addition to the DOS 3.x ',An', ',Llen', 'Bn', and ',Rn' parameters
+   when appropriate, certain commands can also take a few other
+   parameters: ',En' for ending address, ',Fn' for field number, and
+   ',@num' for BASIC line number.
+   
+  4.5 Detailed explanation of commands
+  
+   Please note that I only list any additional commandline params; for
+   optional (and OS-specific) command line params, please see above.
+   
+   - filename
+   [ProDOS only] This command is simply the 'dash' character, followed by
+   a filename. Loads and executes a file of type BIN, BAS, TXT or SYS.
+   
+   APPEND filename
+   [Basic programs only, not from command line.] Parallel to the OPEN
+   command, but positions the file for writing to the end. This is not
+   guaranteed to work under DOS 3.3. For more information on accessing
+   text files from within Basic, please see the Applesoft Basic FAQ at
+   http://www.visi.com/~nathan/a2/faq/asoft.html
+   
+   ProDOS extended syntax: 'APPEND filename[,Ttype][,Llen]': allows
+   overriding of the default filetype of TXT, and also specifies where to
+   append from.
+   
+   BLOAD filename[,Aadr]
+   Loads a binary file from disk to address and length specified when
+   saved. The optional ',Aadr' parameter allows you to specify a new
+   location for the first byte of the file when loaded. No relocation of
+   program code is performed, however.
+   
+   ProDOS extended syntax: 'BLOAD
+   filename[,Aadr][,Blen][,Llen][,Elen][,Ttype]'. Allows you override the
+   address, length, filetype, and from where in the file the chunk you
+   want should be loaded.
+   
+   BSAVE filename,Aadr,Llen
+   Saves a binary file to disk, writing len bytes from the starting
+   address.
+   
+   ProDOS extended syntax: 'BSAVE
+   filename[,Aadr][,Blen][,Llen][,Elen][,Ttype]'. The address and length
+   can be omitted; if so, they default to what was last explicitly
+   specified for the file.
+   
+   BRUN filename
+   Does a BLOAD on a file, and then does a machine language jump to the
+   starting byte, attempting to execute the file. If the file is not
+   designed to be executed, it may crash or behave oddly.
+   
+   ProDOS extended syntax: my copy of 'Apple ProDOS-- Advanced features
+   for programmers' notes that all of the extended params for BLOAD are
+   usable, except for the type.
+   
+   BYE
+   [ProDOS only]. Exits to the currently installed program switcher
+   provided by ProDOS. May not be available on the earliest versions of
+   BASIC.SYSTEM.
+   
+   CAT [pathname]
+   [ProDOS only]. 40-column directory listing.
+   
+   CATALOG
+   Directory listing. DOS 3.x's directory listing fits in 40 columns
+   wide, while ProDOS's CATALOG is 80 columns wide. See also CAT
+   
+   CHAIN filename
+   DOS 3.x integer basic: loads another program, starts executing it with
+   all the variables unchanged from the first. Not really usable with DOS
+   3.x and Applesoft Basic
+   
+   ProDOS extended syntax: 'CHAIN filename[,@line]'-- works with
+   Applesoft BASIC programs properly, allows you to specify a starting
+   line number for program execution
+   
+   CLOSE [filename]
+   Closes any OPENed text files, flushes any pending changes to disk. If
+   a filename is specified, that file is closed; if no filename is
+   specified, any and all open files are closed.
+   
+   CREATE filename[,Ttype]
+   [ProDOS only] Creates a file on disk with the specified name and type.
+   If the type is omitted, a subdirectory (type='DIR')is created.
+   
+   DELETE filename
+   Attempts to delete a file. Files cannot be deleted if the disk is
+   write protected, the file is LOCKed, or an error occurs.
+   
+   EXEC filename
+   Takes a text file on disk, and redirects input from it as if all lines
+   had been typed at the command prompt. It continues until all of the
+   file is parsed this way, not stopping for errors if this is not a
+   valid set of commands.
+   
+   ProDOS extended syntax: 'EXEC filename[,Fnum][,Rnum]'-- allows you to
+   specify the number of the first line in the file executed
+   
+   FLUSH
+   [ProDOS only] Writes any pending (i.e. cached) disk writes to their
+   physical media.
+   
+   FP
+   [DOS 3.x only] Switches to 'Floating Point' (i.e. Applesoft BASIC), if
+   that is available, also dumps any Basic programs out of memory, even
+   if Applesoft was active to start with.
+   
+   FRE
+   [ProDOS only] Faster string garbage collection than that provided by
+   Applesoft Basic in ROM. Useful mainly from within Basic programs.
+   
+   IN#slotnum
+   Redirects input to come from the specified slot, or use slot 0 for the
+   keyboard. This parallels the Basic command of the same name, since
+   both DOS 3.x and ProDOS hook themselves into the i/o vectors, and need
+   to stay attached, even with input coming from elsewhere. Like all OS
+   commands, within an Applesoft Basic program, this command should be
+   preceeded by the control-D character.
+   
+   INIT filename
+   [DOS 3.x only] Formats a disk, and saves the currently loaded Basic
+   program in memory as the program run on boot of that disk with the
+   specified name.
+   
+   INT
+   [DOS 3.x only] Switches to Integer Basic, if available, dumps any
+   Basic programs from memory.
+   
+   LOAD filename
+   Loads a Basic program from disk. Under DOS 3.x, if you load a program
+   with the 'wrong' Basic from what is currently loaded, the Basic is
+   switched, if available.
+   
+   Note that Basic on machines with cassette ports (][, ][+, //e) has a
+   'LOAD' command of its own, where it tries to load from the cassette
+   port. If a filename is specified, then DOS handles it, otherwise it
+   passes it to Basic.
+   
+   LOCK filename
+   Sets a flag on the file so that it cannot be accidentally overwritten
+   or deleted. Does not protect from disk initialization, and is easy to
+   undo with an UNLOCK
+   
+   MAXFILES n
+   [DOS 3.x only] Allocates memory space for the specified number of
+   files to be open at once. The default is 3. BASIC.SYSTEM moves memory
+   around as needed, so this command does not exist under ProDOS.
+   
+   MON [,C][,I][,O]
+   [DOS 3.x only] Provides a running trace of DOS 3.x commands for
+   'Commands', 'Input' and 'Output'.
+   
+   MTR
+   [ProDOS only, and also only available with BASIC.SYSTEM v1.4 or
+   higher, I believe]. Goes to the builtin monitor ('*' prompt), just
+   like typing 'CALL-151'.
+   
+   NOMON [,C][,I][,O]
+   Cancels any pending traces of things by MON. ProDOS accepts by ignores
+   this command, as there is no builtin MON.
+   
+   OPEN filename[,Llen]
+   [Basic programs only, not from command line.] Opens a text file from
+   within a program. It can be read from or written to with the
+   appropriate subsequent commands. The optional length parameter is used
+   to specify that a text file is to be opened in 'random access' mode.
+   For more information on accessing text files from within Basic, please
+   see the Applesoft Basic FAQ at
+   http://www.visi.com/~nathan/a2/faq/asoft.html
+   
+   POSITION filename[,Rn]
+   [Basic programs only, not from command line.] Moves the disk file
+   pointer for the specified file the specified number of fields forward
+   from its current position. If the file is not open, it is OPENed
+   first. If the ',Rn' parameter is omitted, the file pointer is not
+   changed. For more information on accessing text files from within
+   Basic, please see the Applesoft Basic FAQ at
+   http://www.visi.com/~nathan/a2/faq/asoft.html
+   
+   ProDOS extended syntax: the ',Fn' parameter may be used to the same
+   effect.
+   
+   PR#slotnum
+   Sends subsequent output to the specified slot, or the 40-column screen
+   if '0' is given for the slotnum. If output is sent to a slot
+   containing a disk controller, the system attempts to boot from drive 1
+   of that slot. Like all OS commands, within an Applesoft Basic program,
+   this command should be preceeded by the control-D character.
+   
+   PREFIX [pathname]
+   [ProDOS only] Gets or sets the current pathname prefix. If a prefix or
+   slot/drive location is specified, it is used as the new prefix; use a
+   leading slash on a pathname to specify an absolute path, or omit it
+   for a path relative to the current. There is no '..' "backup" operator
+   provided. If no pathname or drive/slot location is specified, the
+   current prefix is returned.
+   
+   READ filename[,Rnum]
+   [Basic programs only, not from command line.] Specifies that
+   subsequent input should come from an already OPENed file. If specified
+   from a random access file, the ',Rnum' jumps to the specified record
+   number. For more information on accessing text files from within
+   Basic, please see the Applesoft Basic FAQ at
+   http://www.visi.com/~nathan/a2/faq/asoft.html
+   
+   ProDOS extended syntax: the ',Fnum' lets you go to the specified line
+   number, and/or ',Bnum' to go to the specified byte position from the
+   current. If multiple params are specified, the record number is jumped
+   to first, then field, then byte.
+   
+   RENAME oldfilename,newfilename
+   Renames the first specified file to the new name. This is one of the
+   few cases where two filenames are required, separated by a comma.
+   
+   RESTORE filename
+   [ProDOS only] Loads a file of Applesoft Basic variable declarations
+   saved with a STORE. Applesoft implements its own RESTORE command for a
+   rather different purpose; the filename is used to flag that this is a
+   DOS command.
+   
+   RUN filename
+   Loads the specified Basic file, and runs it. [Clears all variables,
+   starts execution at lowest numbered line.]
+   
+   ProDOS extended syntax: 'RUN filename[,@line]' -- optional paramter
+   for starting at a line other than the first line. See also CHAIN
+   
+   SAVE filename
+   Writes the current Basic program (no variable declarations) to disk.
+   
+   Note that Basic on machines with cassette ports (][, ][+, //e) has a
+   'SAVE' command of its own, where it tries to save to the cassette
+   port. If a filename is specified, then DOS handles it, otherwise it
+   passes it to Basic.
+   
+   STORE filename
+   [ProDOS only] Stores all current variable declarations (simple and
+   arrays), but not function declarations to disk. Can be loaded back
+   later with a RESTORE.
+   
+   Note that Basic on machines with cassette ports (][, ][+, //e) has a
+   'STORE' command of its own, where it tries to save to the cassette
+   port. If a filename is specified, then DOS handles it, otherwise it
+   passes it to Basic.
+   
+   UNLOCK filename
+   Undoes a LOCK, allowing overwriting or deleting of a file.
+   
+   VERIFY filename
+   DOS 3.x reads every sector of the file to make sure that the file is
+   readable. ProDOS merely checks to see if the file exists or not; does
+   not perform a read test.
+   
+   ProDOS extended syntax: 'VERIFY' with no filename displays a copyright
+   notice.
+   
+   WRITE filename[,Rnum]
+   [Basic programs only, not from command line.] Specifies that
+   subsequent output shoud go to an already OPENed or APPENDed file. If
+   specified from a random access file, the ',Rnum' jumps to the
+   specified record number. For more information on accessing text files
+   from within Basic, please see the Applesoft Basic FAQ at
+   http://www.visi.com/~nathan/a2/faq/asoft.html
+   
+   ProDOS extended syntax: the ',Fnum' lets you go to the specified line
+   number, and/or ',Bnum' to go to the specified byte position from the
+   current. If multiple params are specified, the record number is jumped
+   to first, then field, then byte.
+   
+     _________________________________________________________________
+                                      
+Section 5: Miscellaneous questions and answers
+
+  5.1: Which OS am I in?
+  
+   The best method of checking is to use a command not found in both DOS
+   3.x and ProDOS, such as 'CAT'. If that command works, you're in
+   ProDOS. If not, try 'CATALOG'-- if the 'CATALOG' fails, you have
+   neither standard DOS 3.3 nor standard ProDOS loaded.
+   
+  5.2: How do I format a disk?
+  
+   Under DOS 3.x, use the INIT command to format a disk, write the
+   current memory image of DOS 3.x to the disk, and the current Basic
+   program as the startup program. If the INIT command is not recognized,
+   you are either in ProDOS or you are using a nonstandard patchset to
+   DOS 3.x that removed the INIT command.
+   
+   ProDOS has no builtin disk formatting code; it was removed to make
+   space. You will need to use an application capable of doing the
+   formatting-- common ones are those found on the ProDOS 8 system
+   utilities disk provided by Apple, Copy ][+, Shrinkit, Appleworks, or
+   several other programs. After formatting a ProDOS disk, you will need
+   to copy the 'PRODOS' file and at least one 'SYS' file with name ending
+   in '.SYSTEM' (e.g. BASIC.SYSTEM) to make it bootable, or you'll get an
+   'UNABLE TO LOAD PRODOS' error on trying to boot that disk.
+   
+  5.3: How do I copy/move files/disks?
+  
+   This functionality is not built in to either DOS 3.x or ProDOS from
+   the commandline; you will need to run an application to do so. ProSEL
+   8 published by Charlie's Appleseeds can do a good job at that. Copy
+   ][+ does not follow the rules, and is NOT safe to use on hard drives
+   with ProDOS-- it tends to corrupt the disk if any GS/OS 'extended'
+   files are present.
+   
+   In a pinch, if you only need to copy files, you can manually LOAD/SAVE
+   or BLOAD/BSAVE to load and then save files from one disk to another,
+   but this is extremely tedious, does not tend to work (unless uses
+   extra params under ProDOS) on large (>35K) files or non-basic/binary
+   files, and errprone.
+   
+  5.4: Can I put DOS 3.x on my hard disk?
+  
+   Not by any publically available methods to my knowledge. DOS 3.x was
+   designed for only 5.25" disks, though it is possible to put up to 400K
+   on a DOS 3.x volume. With 254 volume types available, you could creake
+   up to about 98MB on a HD. DOS 3.x also does not have any builtin
+   support for any drives other than the 5.25" drive-- you'd have to
+   manually hack the OS to talk to a different drive. In any case, you're
+   still limited by a lot of 400K volumes, lack of subdirectories, and
+   having to rewrite the OS yourself.
+   
+   ProDOS is much more HD friendly, in terms of being able to talk to
+   volumes up to 32MB in size, subdirectory support, and the like.
+   
+   A somewhat workable solution is to use DOS 3.3 Launcher. It lets you
+   copy unprotected DOS 3.3 140K disks to your hard drive, and run DOS
+   3.3 under ProDOS. Such functionality does have some requirements,
+   though: programs must only use 48K of RAM (the upper 16K is reserved
+   for ProDOS, which is running at the same time), not do any copy
+   protection or disk hackery, and generally behave themselves. DOS 3.3
+   Launcher is available from the normal Apple II ftp sites:
+   ftp://apple2.caltech.edu/pub/apple2/utils/dos3.3.shk
+   
+  5.5: Can I speed up DOS 3.3 or ProDOS?
+  
+   Due to some double-buffering while reading and decoding files off
+   disks, DOS 3.x was not as fast as it could be. A few companies sold
+   modified versions of DOS 3.3 to avoid the extra copy and thus
+   dramatically speed up disk access; Beagle Bros's ProntoDOS and many
+   others were widespread. Sorry, I do not know where any copies of these
+   speedups can be found legally online. [And I'm not going to help
+   anyone break the law.] ProDOS incorporates most to all of the disk
+   read speedups provided by DOS 3.3 third party enhancements, so it does
+   not need to be patched to sped up.
+   
+  5.6: What about file/disk undeletion?
+  
+   File undeletion capabilities are available for DOS 3.x via various
+   programs (sorry, no idea if any are available legally online). ProDOS
+   prior to version 1.4 (or maybe 1.2) scrambled filetables on deletion,
+   so it is much harder to recover data if deleted under that. ProSEL and
+   other commercially available programs can undelete ProDOS files.
+   
+   There is no disk undelete functionality available-- if a disk is fully
+   reformatted (all sectors/blocks overwritten), all previous data is
+   obliterated. If only the directory track(s) are erased, it might be
+   possible with a lot of work-- ProSEL 8 published by Charlie's
+   Appleseeds has a number of tools for dealing with ProDOS disks.
+   
+  5.7: How do I view a text file?
+  
+   Along with copying files/disks, this is another area not directly
+   supported by either DOS 3.3 or ProDOS without addon programs. Under
+   ProDOS, 'Sneeze' is reported to be a good file viewer:
+   ftp://ground.isca.uiowa.edu/apple2/apple8/Pgms/SNEEZE.SHK
+   
+  5.8: What does "UNABLE TO LOAD PRODOS" mean when I boot a disk?
+  
+   As noted above, ProDOS is not automatically installed on every disk
+   formatted under ProDOS. All that is writted to disk is a very short
+   boot program that looks for a system (type 'SYS') file in the root
+   directory called 'PRODOS'. If that file is present, it is loaded, and
+   ProDOS installs itself. If there is no PRODOS file found, the error
+   message of "UNABLE TO LOAD PRODOS" is displayed on the screen.
+   
+   To make such a disk bootable, all you need to do is copy the file
+   'PRODOS' from a working ProDOS boot disk to the root directory of the
+   disk you want to be able to boot from, assuming there is enough free
+   space to copy that file.
+   
+   You will also want to copy at least one other system (type='SYS') to
+   the root directory of any disk you want to boot, as ProDOS scans the
+   root directory for the first SYS file with name ending in ".SYSTEM" to
+   execute, or it'll be unhappy. A good candidate for such a file is
+   Apple's "BASIC.SYSTEM", providing the Basic interpreter and command
+   line interface to ProDOS.
+   
+   If you choose to use Macs and Disk Copy to download System 6.x, make
+   sure to use Double Sided/Double Density (DSDD - 720K or 800K) disks--
+   1.44MB (HD) disks will be written to as 1.44MB disks, which most GS
+   drives cannot deal with. Also, if your GS is refusing to boot off the
+   install disk (with an 'UNABLE TO LOAD PRODOS' message), and you have a
+   Quadra or Powermac, you may be a victim of Apple's costcutting in 3.5"
+   drives-- those drives may report disks as successfully written, but
+   GSs will be unable to read them. Switch to an older Mac with a usable
+   drive, or use a null modem program to transfer the files.
+   
+  5.9 How do I switch drives/disks?
+  
+   DOS 3.3 and also ProDOS allow you to specify which disk you want to
+   use by specifying its physical location when accessing it. This is
+   done with the slot-changing ',Sx' (1<=x<=7) and/or drive-changing
+   ',Dy' (y=1 or y=2) parameters at the end of a command. Each slot may
+   have up to 2 drives connected to it. Slot 6 is normally used for 5.25"
+   drives, and slot 5 for 3.5" [or to a lesser degree, Slot 3 Drive 2 if
+   /RAM5 is used] disks, but system configurations may vary.
+   
+   The slot/drive selections are 'sticky'-- they'll remain in effect
+   until you select another slot/drive to use.
+   
+   Under ProDOS, you can also use the PREFIX command to change to a
+   slot/drive combination [PREFIX[,Sx][,Dy]] or to a volume by volume
+   name [PREFIX /volname].
+   
+  5.10 I don't have an OS for my Apple II or want an update. Where do I get it
+  from?
+  
+   [Copied from the comp.sys.apple2 FAQ section 7.2 at
+   http://www.visi.com/~nathan/a2/faq/csa2.html . Consult that FAQ for
+   help on downloading, etc.]
+   
+   First, consult the following chart to help determine what you should
+   be looking to run on your Apple II-- there's a lot of possible OSs.
+   Downloads usually require you to have comm programs up and running on
+   your Apple II and/or Mac with a 3.5" disk that fully supports 800K
+   disks (a lot of Powermacs are flakey in that area). Without such an
+   ability, see below for places to purchase/copy it from. See csa2 FAQ
+   Section 2.* on the Apple II models or csa2 FAQ section 7.7 on
+   determing RAM to determine what your Apple II has if the limitations
+   in the following are confusing.
+   
+     * Any Apple II, 5.25" drive, 32K or more RAM: DOS 3.3. This is not
+       legally available online to the best of my knowledge, as Apple
+       still holds the copyright and distribution restrictions on it.
+       However, Diversi-DOS, a Shareware enhanced version (may require
+       48K or 64K RAM) of it with many speedups is available online:
+       ftp://ground.isca.uiowa.edu/apple2/apple8/OS/divdos41c.bxy
+     * Apple II+ or better, 5.25", 3.5", or HD, 64K RAM: ProDOS 8
+       v1.0-1.9. [Avoid v1.3 if using a ][+ or unenhanced //e].
+       ftp://ftp.apple.com/Apple.Support.Area/Apple.Software.Updates/US/A
+       pple_II/Apple_II_Supplemental/Apple_II_System_Disk_3.2.bxy [Note:
+       have not verified that this is ProDOS 1.9]
+     * Apple //c or IIc+, Enhanced //e, GS, 5.25", 3.5", or HD: ProDOS 8
+       v2.x. A shrunk 800K 3.5" disk with this version is at
+       ftp://ftp.apple.com/dts/aii/sys.soft/8bit.system.4.0.2/sysdisk402.
+       bsc [Not available in 5.25" format online]
+     * Apple IIGS, 3.5" disk or HD, 512K or more RAM: ProDOS 16. Very old
+       and slow. Not available anywhere online legally to my knowledge.
+     * Apple IIGS (ROM version 01 or 3), 3.5" disk or HD, 768K or more
+       RAM: GS/OS version 5.0.4. Get the .bsc files from
+       ftp://ftp.apple.com/dts/aii/sys.soft/gs.system.5.0.4/
+     * Apple IIGS (ROM version 01 or 3), 3.5" disk or HD (HD highly
+       recommended), 1MB or more RAM: GS/OS version 6.0.1. Download from
+       ftp://ftp.apple.com/dts/aii/sys.soft/gs.system.6.0.1/ or a Mac
+       'Disk Copy' format at
+       ftp://ftp.apple.com/Apple.Support.Area/Apple.Software.Updates/US/A
+       pple_II/Apple_IIGS_System_6.0.1/ See the csa2 FAQ's Section 9
+       (System 6.0 Mini-FAQ) for more info on bugfixes, updates, problems
+       with this version.
+       
+   All of the above were always distributed as full versions of the
+   system software; there is no need to 'upgrade' thru system 4 or 5 to
+   get to 6. Consequently, don't look for any patches to save download
+   time; those never existed.
+   
+   [Note: there are some other versions of the System Disks not listed
+   above; the ones listed are the latest versions, which you should be
+   running to get as many features and as few bugs as possible. Most of
+   the older (and especially the very buggy) versions are not available
+   online for that reason.]
+   
+   Without an operating system, you can't run a comm program to download
+   the operating system, so you're in a bit of a quandry. One method is
+   to call 1-800-SOS-APPL and try and find an Apple II user group in your
+   area. They should be able copy things for you.
+   
+   If you are unable to find a local user group, one of the next best
+   options is to contact Steve Cavanaugh (section 10.2), who is licensed
+   to copy ProDOS 8 [runs on pretty much all Apple IIs with at least 64K
+   of RAM], along with a 5.25" disk full of comm programs, etc. The comm
+   program disk costs only $3, which is a great deal. Ask him for more
+   details if interested.
+   
+   Alltech Electronics (see csa2 FAQ section 10.2) is licensed to sell
+   many of the above, such as GS System Software 5.0.4 and 6.0.1, Apple
+   // System Disk 4.02, and ProDOS 1.1.1. Contact them for details on
+   pricing, etc.
+   
+     _________________________________________________________________
+
+Email suggestions to nathan@visi.com. As always, let me know of any
+mistakes, updates, corrections, additions, etc.
+
+There are a lot more questions with answers not included directly in
+this FAQ; please see http://www.visi.com/~nathan/a2/faq for more of
+them.
+
+Copyright 1997 by Nathan Mates (Nathan Mates)
+--
+<*> Nathan Mates http://www.visi.com/~nathan/      <*>
+# What are the facts? Again and again and again-- what are the _facts_?
+# Shun wishful thinking, avoid opinion, care not what the neighbors
+# think-- what are the facts, and to how many decimal places? -R.A. Heinlein
+

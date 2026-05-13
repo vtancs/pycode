@@ -1,0 +1,83 @@
+import pygame
+import random
+import math
+
+# Initialize pygame
+pygame.init()
+
+# Screen setup
+WIDTH, HEIGHT = 640, 480
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Barnsley Fern - Pygame")
+
+clock = pygame.time.Clock()
+
+# Black background
+screen.fill((0, 0, 0))
+
+# Starting point
+x = 0.0
+y = 0.0
+
+# Store brightness values for glow effect
+green_map = [[0 for _ in range(HEIGHT)] for _ in range(WIDTH)]
+
+# Convert fern coordinates to screen coordinates
+def transform(px, py):
+    sx = int(WIDTH / 2 + px * 60)
+    sy = int(HEIGHT - py * 45)
+    return sx, sy
+
+running = True
+points_per_frame = 5000
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Draw many points every frame
+    for _ in range(points_per_frame):
+
+        r = random.random()
+
+        # Barnsley fern transformations
+        if r < 0.01:
+            nx = 0
+            ny = 0.16 * y
+
+        elif r < 0.86:
+            nx = 0.85 * x + 0.04 * y
+            ny = -0.04 * x + 0.85 * y + 1.6
+
+        elif r < 0.93:
+            nx = 0.20 * x - 0.26 * y
+            ny = 0.23 * x + 0.22 * y + 1.6
+
+        else:
+            nx = -0.15 * x + 0.28 * y
+            ny = 0.26 * x + 0.24 * y + 0.44
+
+        x, y = nx, ny
+
+        # Convert to screen position
+        sx, sy = transform(x, y)
+
+        # Draw only if inside screen
+        if 0 <= sx < WIDTH and 0 <= sy < HEIGHT:
+
+            # Increase brightness gradually
+            if green_map[sx][sy] < 255:
+                green_map[sx][sy] += 8
+
+            brightness = min(green_map[sx][sy], 255)
+
+            # Fern green color
+            color = (0, brightness, 0)
+
+            screen.set_at((sx, sy), color)
+
+    pygame.display.flip()
+    clock.tick(60)
+
+pygame.quit()

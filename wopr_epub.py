@@ -1,0 +1,354 @@
+import pygame
+import os
+import sys
+import array
+import zipfile
+import re
+from html.parser import HTMLParser
+from datetime import datetime
+
+# --- System Setup ---
+pygame.init()
+pygame.mixer.init(frequency=22050, size=-16, channels=1)
+
+# macOS Foreground Window Enforcement
+try:
+    if sys.platform == "darwin":
+        from AppKit import NSApplication, NSApp, NSApplicationActivationPolicyRegular
+        NSApp = NSApplication.sharedApplication()
+        NSApp.setActivationPolicy_(NSApplicationActivationPolicyRegular)
+        NSApp.activateIgnoringOtherApps_(True)
+except ImportError:
+    pass
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for py2app """
+    if hasattr(sys, 'frozen'):
+        base_path = os.path.join(os.path.dirname(sys.executable), '..', 'Resources')
+        return os.path.abspath(os.path.join(base_path, relative_path))
+    return os.path.join(os.path.abspath("."), relative_path)
+
+info_object = pygame.display.Info()
+SCREEN_WIDTH = info_object.current_w
+SCREEN_HEIGHT = info_object.current_h
+
+# Retro Color Palette
+BG_COLOR = (5, 5, 12)
+TEXT_COLOR = (120, 255, 255)
+CLOCK_COLOR = (200, 200, 200)
+BORDER_COLOR = (50, 255, 50)
+BORDER_GLOW = (0, 150, 0, 100)
+SCANLINE_COLOR = (0, 0, 0, 95)
+LED_ON = (255, 0, 0)
+LED_OFF = (60, 0, 0)
+
+class EPUBTextExtractor(HTMLParser):
+    """Custom HTML parser to strip out tags and collect clean readable text."""
+    def __init__(self):
+        super().__init__()
+        self.text_data = []
+
+    def handle_data(self, data):
+        self.text_data.append(data)
+
+    def get_text(self):
+        raw = "".join(self.text_data)
+        return re.sub(r'\n\s*\n', '\n\n', raw).strip()
+
+class WOPRTerminal:
+    def __init__(self, target_file):
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
+        pygame.display.set_caption("W.O.P.R. STRATEGIC COMMAND")
+        
+        self.target_file = target_file
+        self.font_sizes = [10, 12, 14, 18, 20, 22, 24, 28]
+        self.font_index = 4  
+        self.load_fonts()
+
+        self.clock = pygame.time.Clock()
+        self.speed_level = 15 
+        self.sound_enabled = True
+        self.click_sound = self.generate_click_sound()
+        
+        # Core Content
+        self.raw_content = self.load_epub_data()
+        self.char_index = 0
+        self.streamed_text = ""
+        
+        # Wrap Layout Cache
+        self.current_width = SCREEN_WIDTH
+        self.wrapped_lines = [""]
+        
+        # Timing / Cursor
+        self.last_char_time = pygame.time.get_ticks()
+        self.cursor_visible = True
+        self.last_cursor_blink = pygame.time.get_ticks()
+        self.running = True
+
+    '''
+    def generate_click_sound(self):
+        duration = 0.01 
+        sample_rate = 22050
+        n_samples = int(duration * sample_rate)
+        buf = array.array('h', [0] * n_samples)
+        for i in range(n_samples):
+            value = 16384 * (1.0 - float(i)/n_samples) * (1 if (i // 10) % 2 == 0 else -1)
+            buf[i] = int(value)
+        return pygame.mixer.Sound(buf)
+    '''
+    
+    def generate_click_sound(self):
+        """Synthesizes a dual-tone 1980s mainframe data readout chime matching readout2.mp3."""
+        import math
+        
+        duration = 0.045       # ~45 milliseconds short burst
+        sample_rate = 22050
+        n_samples = int(duration * sample_rate)
+        buf = array.array('h', [0] * n_samples)
+        
+        # Primary frequencies that mimic the WOPR teletype sound signature
+        freq1 = 2400.0  
+        freq2 = 1200.0
+        
+        for i in range(n_samples):
+            t = float(i) / sample_rate
+            
+            # Create standard square waves via sine wave signs
+            wave1 = 1.0 if math.sin(2 * math.pi * freq1 * t) >= 0 else -1.0
+            wave2 = 1.0 if math.sin(2 * math.pi * freq2 * t) >= 0 else -1.0
+            
+            # Combine the waves (interfering mix)
+            mixed_wave = (wave1 * 0.6) + (wave2 * 0.4)
+            
+            # Exponential volume decay envelope to create a sharp "ping" instead of a buzz
+            envelope = math.exp(-95.0 * t) 
+            
+            # Scale to 16-bit signed integer limits (-32768 to 32767)
+            amplitude = 14000.0 * mixed_wave * envelope
+            buf[i] = int(amplitude)
+            
+        return pygame.mixer.Sound(buf)
+     
+    def load_fonts(self):
+        size = self.font_sizes[self.font_index]
+        font_file = resource_path("Fixedsys.ttf")
+        if os.path.exists(font_file):
+            self.font = pygame.font.Font(font_file, size)
+            self.small_font = pygame.font.Font(font_file, 18)
+        else:
+            self.font = pygame.font.SysFont("monospace", size, bold=True)
+            self.small_font = pygame.font.SysFont("monospace", 18, bold=True)
+        self.line_height = int(size * 1.3)
+        if hasattr(self, 'streamed_text'):
+            self.recalculate_word_wrap()
+
+    def load_epub_data(self):
+        """Opens an EPUB file container, extracts text chapters, strips HTML markup, and filters out non-font chars."""
+        epub_path = resource_path(self.target_file)
+        if not os.path.exists(epub_path):
+            return f"GREETINGS PROFESSOR FALKEN.\n\nERROR: {self.target_file.upper()} NOT FOUND."
+        if not zipfile.is_zipfile(epub_path):
+            return "SYSTEM ERROR: INVALID SOURCE FILE (NOT A VALID EPUB ARCHIVE)"
+
+        try:
+            full_book_text = []
+            with zipfile.ZipFile(epub_path, 'r') as archive:
+                text_files = [f for f in archive.namelist() if f.endswith(('.html', '.xhtml', '.htm'))]
+                text_files.sort()
+
+                if not text_files:
+                    return "SYSTEM ERROR: NULL CONTENT ARCHIVE STRUCTURE"
+
+                for file_entry in text_files:
+                    with archive.open(file_entry) as f:
+                        html_content = f.read().decode('utf-8', errors='ignore')
+                        parser = EPUBTextExtractor()
+                        parser.feed(html_content)
+                        chapter_text = parser.get_text()
+                        if chapter_text:
+                            full_book_text.append(chapter_text)
+
+            raw_text = "\n\n[NEXT CHAPTER]\n\n".join(full_book_text).upper()
+            
+            # --- ADVANCED SANITIZATION ENGINE ---
+            # Pre-swap common high-order typography symbols
+            replacements = {
+                "‘": "'", "’": "'", "“": '"', "”": '"',
+                "—": " - ", "–": "-", "…": "...", " ": " ", "•": "*"
+            }
+            for advanced_char, ascii_char in replacements.items():
+                raw_text = raw_text.replace(advanced_char.upper(), ascii_char)
+            
+            # --- STRICT WHITELIST FILTER ---
+            # Define exact characters that Fixedsys natively supports.
+            # Any rogue character outside this list will turn into a space.
+            sanitized_chars = []
+            allowed_chars = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?-+/\\_@()[]{}<>:;\"'=$%&* \n")
+            
+            for char in raw_text:
+                if char in allowed_chars:
+                    sanitized_chars.append(char)
+                else:
+                    # Fallback default: if it's an invisible/weird layout break, drop in a space
+                    sanitized_chars.append(" ")
+            
+            # Compress unexpected double spaces created by filtered blocks
+            clean_text = "".join(sanitized_chars)
+            return re.sub(r' +', ' ', clean_text)
+            
+        except Exception as e:
+            return f"SYSTEM ERROR: CORRUPTED DATA ENGINE DEPLOYMENT\n{str(e).upper()}"
+
+    def recalculate_word_wrap(self):
+        """Processes streamed text into wrapping lines that fit inside the current boundary."""
+        margin_left = 60
+        margin_right = 160  
+        max_width = self.current_width - margin_left - margin_right
+
+        lines = self.streamed_text.split('\n')
+        self.wrapped_lines = []
+
+        for line in lines:
+            if line == '':
+                self.wrapped_lines.append('')
+                continue
+            
+            words = line.split(' ')
+            current_line = ""
+            
+            for word in words:
+                test_line = current_line + (" " if current_line else "") + word
+                if self.font.size(test_line)[0] <= max_width:
+                    current_line = test_line
+                else:
+                    self.wrapped_lines.append(current_line)
+                    current_line = word
+            
+            if current_line:
+                self.wrapped_lines.append(current_line)
+        
+        if not self.wrapped_lines:
+            self.wrapped_lines = [""]
+
+    def get_delay(self):
+        if self.speed_level >= 30: return 0
+        return 600 * (0.83 ** self.speed_level)
+
+    def draw_neon_border(self, width, height):
+        glow_surf = pygame.Surface((width, height), pygame.SRCALPHA)
+        pygame.draw.rect(glow_surf, BORDER_GLOW, (0, 0, width, height), 12)
+        self.screen.blit(glow_surf, (0, 0))
+        pygame.draw.rect(self.screen, BORDER_COLOR, (3, 3, width-6, height-6), 4)
+        
+    def draw_led_bar(self, width, height):
+        num_leds = 30
+        led_w, led_h, gap = 25, 10, 4
+        x_pos = width - 50 - 10
+        start_y = height - 80 - 10
+        for i in range(num_leds):
+            y_pos = start_y - (i * (led_h + gap))
+            is_active = (i + 1) <= self.speed_level
+            color = LED_ON if is_active else LED_OFF
+            pygame.draw.rect(self.screen, color, (x_pos, y_pos, led_w, led_h))
+            if is_active:
+                pygame.draw.rect(self.screen, (255, 150, 150), (x_pos, y_pos, led_w, led_h), 1)
+        label = self.small_font.render("PROC SPEED", True, CLOCK_COLOR)
+        self.screen.blit(label, (x_pos - 70, start_y + 20))
+        val_surf = self.small_font.render(f"{self.speed_level:02}", True, LED_ON if self.speed_level == 30 else (255, 255, 255))
+        self.screen.blit(val_surf, (x_pos + 4, start_y - (num_leds * (led_h + gap)) - 25))
+
+    def handle_input(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: 
+                self.running = False
+            elif event.type == pygame.VIDEORESIZE:
+                self.current_width = event.w
+                pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
+                self.recalculate_word_wrap()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE: self.running = False
+                elif event.key == pygame.K_UP: self.speed_level = min(30, self.speed_level + 1)
+                elif event.key == pygame.K_DOWN: self.speed_level = max(1, self.speed_level - 1)
+                elif event.key == pygame.K_LEFTBRACKET: 
+                    self.font_index = max(0, self.font_index - 1)
+                    self.load_fonts()
+                elif event.key == pygame.K_RIGHTBRACKET: 
+                    self.font_index = min(len(self.font_sizes) - 1, self.font_index + 1)
+                    self.load_fonts()
+                elif event.key == pygame.K_q:
+                    self.sound_enabled = not self.sound_enabled
+
+    def update(self):
+        now = pygame.time.get_ticks()
+        delay = self.get_delay()
+        if now - self.last_cursor_blink > 500:
+            self.cursor_visible = not self.cursor_visible
+            self.last_cursor_blink = now
+
+        chars_this_frame = 100 if delay == 0 else (int(16 / max(1, delay)) if delay < 16 else 1)
+        sound_played = False
+
+        for _ in range(chars_this_frame):
+            if self.char_index < len(self.raw_content):
+                if delay < 16 or (now - self.last_char_time > delay):
+                    char = self.raw_content[self.char_index]
+                    self.streamed_text += char
+                    self.char_index += 1
+                    self.last_char_time = now
+                    self.cursor_visible = True
+                    
+                    self.recalculate_word_wrap()
+                    
+                    if self.sound_enabled and not sound_played and not char.isspace():
+                        self.click_sound.play()
+                        sound_played = True 
+                else: break
+            else: break
+
+    def draw(self):
+        w, h = self.screen.get_size()
+        self.screen.fill(BG_COLOR)
+        self.draw_neon_border(w, h)
+        
+        now_dt = datetime.now()
+        time_str = now_dt.strftime("%b %d %Y  %H:%M:%S").upper()
+        snd_status = "ON" if self.sound_enabled else "OFF"
+        info_str = f"EPUB SOURCE: {self.target_file.upper()} | FONT: {self.font_sizes[self.font_index]}PT | SOUND {snd_status}"
+        
+        time_surf = self.small_font.render(time_str, True, CLOCK_COLOR)
+        info_surf = self.small_font.render(info_str, True, TEXT_COLOR)
+        self.screen.blit(info_surf, (60, 40))
+        self.screen.blit(time_surf, (w - time_surf.get_width() - 110, 40))
+
+        margin_left, start_y = 60, 110
+        max_visible = (h - start_y - 80) // self.line_height
+        visible_lines = self.wrapped_lines[-max_visible:]
+        
+        for i, line in enumerate(visible_lines):
+            y_pos = start_y + (i * self.line_height)
+            line_surf = self.font.render(line, True, TEXT_COLOR)
+            self.screen.blit(line_surf, (margin_left, y_pos))
+            
+            if i == len(visible_lines) - 1 and self.cursor_visible:
+                c_x = margin_left + line_surf.get_width() + 2
+                c_w, c_h = self.font_sizes[self.font_index] // 2 + 4, self.line_height // 2
+                pygame.draw.rect(self.screen, TEXT_COLOR, (c_x, y_pos + (self.line_height // 2) - 4, c_w, c_h))
+
+        self.draw_led_bar(w, h)
+        for y in range(0, h, 4):
+            s = pygame.Surface((w, 2), pygame.SRCALPHA)
+            s.fill(SCANLINE_COLOR)
+            self.screen.blit(s, (0, y))
+        pygame.display.flip()
+
+    def run(self):
+        while self.running:
+            self.handle_input()
+            self.update()
+            self.draw()
+            self.clock.tick(60)
+        pygame.quit()
+
+if __name__ == "__main__":
+    cli_file = sys.argv[1] if len(sys.argv) > 1 else "book.epub"
+    WOPRTerminal(cli_file).run()

@@ -55,6 +55,7 @@ class WOPRTerminal:
         self.last_cursor_blink = pygame.time.get_ticks()
         self.running = True
 
+    '''
     def generate_click_sound(self):
         duration = 0.01 
         sample_rate = 22050
@@ -64,7 +65,40 @@ class WOPRTerminal:
             value = 16384 * (1.0 - float(i)/n_samples) * (1 if (i // 10) % 2 == 0 else -1)
             buf[i] = int(value)
         return pygame.mixer.Sound(buf)
-
+    '''
+    
+    def generate_click_sound(self):
+        """Synthesizes a dual-tone 1980s mainframe data readout chime matching readout2.mp3."""
+        import math
+        
+        duration = 0.045       # ~45 milliseconds short burst
+        sample_rate = 22050
+        n_samples = int(duration * sample_rate)
+        buf = array.array('h', [0] * n_samples)
+        
+        # Primary frequencies that mimic the WOPR teletype sound signature
+        freq1 = 2400.0  
+        freq2 = 1200.0
+        
+        for i in range(n_samples):
+            t = float(i) / sample_rate
+            
+            # Create standard square waves via sine wave signs
+            wave1 = 1.0 if math.sin(2 * math.pi * freq1 * t) >= 0 else -1.0
+            wave2 = 1.0 if math.sin(2 * math.pi * freq2 * t) >= 0 else -1.0
+            
+            # Combine the waves (interfering mix)
+            mixed_wave = (wave1 * 0.6) + (wave2 * 0.4)
+            
+            # Exponential volume decay envelope to create a sharp "ping" instead of a buzz
+            envelope = math.exp(-95.0 * t) 
+            
+            # Scale to 16-bit signed integer limits (-32768 to 32767)
+            amplitude = 14000.0 * mixed_wave * envelope
+            buf[i] = int(amplitude)
+            
+        return pygame.mixer.Sound(buf)
+    
     def load_fonts(self):
         size = self.font_sizes[self.font_index]
         # Use resource_path for the font file
